@@ -44,4 +44,4 @@ Protons are found in the nucleus of every atom and play a crucial role in determ
 ```
 > Enter `quit` to exit the chatbot.
 
-Reponses from the user and assistant are saved and appended to chat history after each turn, thus enabling the LLM to remember what has been said previously and keeping the conversation going. Furthermore, using chat templates helps the model to adequately generate its responses in ChatGPT-like fashion.
+Responses from the user and assistant are saved and appended to chat history after each turn, thus enabling the LLM to remember what has been said previously and keeping the conversation going. Furthermore, using chat templates helps the model to adequately generate its responses in ChatGPT-like fashion.
