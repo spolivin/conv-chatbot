@@ -2,7 +2,6 @@
 
 This is a repository dedicated to my attempt to create an interface for interacting with a LLM. Currently it represents a simple script with infinite loop for the continuity of the conversation but I plan to add more features:
 
-* Saving and loading of conversations.
 * Chatbot as a Streamlit app.
 * Chatbot as a FastAPI endpoint.
 
@@ -45,3 +44,14 @@ Protons are found in the nucleus of every atom and play a crucial role in determ
 > Enter `quit` to exit the chatbot.
 
 Responses from the user and assistant are saved and appended to chat history after each turn, thus enabling the LLM to remember what has been said previously and keeping the conversation going. Furthermore, using chat templates helps the model to adequately generate its responses in ChatGPT-like fashion.
+
+### Loading and saving chats
+
+Recently added feature enables loading and saving chats with the assistant that have been started before. For instance, running the above command to launch the chatbot will on exit save a conversation in `chats` folder in the current working directory. 
+
+Alternatively, we can load a conversation one have started and exited by running the following command:
+
+```
+python run_chatbot.py --chat-id=24bd1a
+```
+> All saved user-assistant messages will appear in the terminal window.
