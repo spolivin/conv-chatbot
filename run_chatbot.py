@@ -18,8 +18,11 @@ parser.add_argument(
     help="System prompt",
     default="You are a helpful and concise assistant.",
 )
+parser.add_argument("--max-new-tokens", type=int, help="Max new tokens", default=2048)
+parser.add_argument("--temperature", type=float, help="Temperature", default=0.8)
 parser.add_argument("--chat-id", type=str, help="Conversation ID", default=None)
 args = parser.parse_args()
+
 
 def display_chat_history(history: list[dict[str, str]]):
     """Displays all messages belonging to the chat.
@@ -35,6 +38,7 @@ def display_chat_history(history: list[dict[str, str]]):
             print(f"Assistant: {message}\n")
         else:
             pass
+
 
 def main():
     chat = ChatSession(system_prompt=args.sys_prompt)
@@ -58,10 +62,15 @@ def main():
             break
 
         chat.add_message(role="user", content=user_input)
-        response = model.generate(messages=chat.get_history())
 
+        print("Assistant: ", end="")
+        # Streaming response from the model
+        response = model.generate(
+            messages=chat.get_history(),
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+        )
         chat.add_message(role="assistant", content=response)
-        print(f"Assistant: {response}\n")
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
