@@ -1,5 +1,7 @@
+import threading
+
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
 
 
 class ChatModel:
@@ -11,6 +13,9 @@ class ChatModel:
         self.model_name = model_name
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.streamer = TextIteratorStreamer(
+            self.tokenizer, skip_prompt=True, skip_special_tokens=True
+        )
 
         # Choosing params for configuring the model depending on the device
         if torch.cuda.is_available():
@@ -59,19 +64,25 @@ class ChatModel:
         model_device = next(self.model.parameters()).device
         llm_input_dict = {k: v.to(model_device) for k, v in llm_input_dict.items()}
 
-        # Generating the response
-        with torch.no_grad():
-            output_ids = self.model.generate(
+        # Generating the response in a separate thread
+        generation_thread = threading.Thread(
+            target=self.model.generate,
+            kwargs=dict(
                 **llm_input_dict,
+                streamer=self.streamer,
                 max_new_tokens=max_new_tokens,
-                temperature=temperature,
-                do_sample=True,
-            )
-
-        # Decoding only the newly generated tokens
-        input_len = llm_input_dict["input_ids"].shape[-1]
-        generated_text = self.tokenizer.decode(
-            output_ids[0][input_len:], skip_special_tokens=True
+                temperature=temperature
+            ),
         )
+        generation_thread.start()
 
-        return generated_text.strip()
+        # Streaming, saving and printing the response as it is generated
+        assistant_response = ""
+        for new_text in self.streamer:
+            print(new_text, end="", flush=True)
+            assistant_response += new_text
+        print("\n")
+
+        generation_thread.join()
+
+        return assistant_response
