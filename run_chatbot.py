@@ -7,16 +7,10 @@ from chatbot_api import ChatModel, ChatSession
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--model-name",
-    type=str,
-    help="Model name for assistant",
-    default="Qwen/Qwen2.5-1.5B-Instruct",
-)
-parser.add_argument(
     "--sys-prompt",
     type=str,
     help="System prompt",
-    default="You are a helpful and concise assistant.",
+    default="You are a helpful assistant.",
 )
 parser.add_argument("--max-new-tokens", type=int, help="Max new tokens", default=2048)
 parser.add_argument("--temperature", type=float, help="Temperature", default=0.8)
@@ -42,7 +36,7 @@ def display_chat_history(history: list[dict[str, str]]):
 
 def main():
     chat = ChatSession(system_prompt=args.sys_prompt)
-    model = ChatModel(model_name=args.model_name)
+    model = ChatModel(model_name="Qwen/Qwen2.5-1.5B-Instruct")
 
     # Loading a specific chat history (if provided in args)
     if args.chat_id is not None:
@@ -65,12 +59,17 @@ def main():
 
         print("Assistant: ", end="")
         # Streaming response from the model
-        response = model.generate(
+        assistant_response = ""
+        for token in model.generate(
             messages=chat.get_history(),
             max_new_tokens=args.max_new_tokens,
             temperature=args.temperature,
-        )
-        chat.add_message(role="assistant", content=response)
+        ):
+            print(token, end="", flush=True)
+            assistant_response += token
+        print("\n")
+
+        chat.add_message(role="assistant", content=assistant_response)
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
