@@ -16,6 +16,7 @@ class ChatSession:
         self.save_dir = "chats"
 
         if system_prompt:
+            self.system_prompt = system_prompt
             self.history.append({"role": "system", "content": system_prompt})
 
     def add_message(self, role: str, content: str):
@@ -55,3 +56,10 @@ class ChatSession:
         self.chat_id = chat_id
         with open(f"{self.save_dir}/{chat_id}.json", "r") as json_file:
             self.history = json.load(json_file)
+
+    def reset_history(self):
+        """Resets the chat history."""
+        self.history = []
+        self.chat_id: str = uuid.uuid4().hex[:6]
+        if hasattr(self, "system_prompt"):
+            self.history.append({"role": "system", "content": self.system_prompt})
