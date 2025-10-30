@@ -1,11 +1,14 @@
-# Conversational Chatbot
+# 💬 Conversational Chatbot
 
-This is a repository dedicated to my attempt to create an interface for interacting with a LLM. Currently it represents a simple script with infinite loop for the continuity of the conversation but I plan to add more features:
+This repository contains code for launching an interface for interacting with an instruction-tuned Large Language Model (LLM). Currently, one can chat with an LLM in two ways:
 
-* Chatbot as a Streamlit app.
-* Chatbot as a FastAPI endpoint.
+* Running **Python script** (chatting in the terminal)
+* Running a **Streamlit application** in browser (chatting in browser in user-friendly interface)
 
-## Launching chatbot
+
+## 🚀 Chatbot interface
+
+### Preparation of virtual environment
 
 Firstly, one should clone the repository:
 
@@ -23,12 +26,32 @@ conda activate chat-venv
 pip install -r requirements.txt
 ```
 
-Now, we can run the chatbot:
+or just via using an already prepared conda script:
+
+```bash
+source setup_env.sh
+```
+> Note: In case of using Linux.
+
+### Launching chatbot
+
+#### Python script
+
+We can run the chatbot as a script and after model loading a user will be prompted to send a message:
 
 ```bash
 python run_chatbot.py
 ```
-> Currently the script uses `Qwen/Qwen2.5-1.5B-Instruct` model from Hugging Face. The model has been chosen due to its relatively small size and due to the absence of GPU on a local machine. Despite these limitations, the script is adapted to efficiently run the model on both CPU and GPU.
+> Enter `quit` to exit the chatbot.
+
+Alternatively, we can load a conversation one have started and exited by running the following command:
+
+```bash
+python run_chatbot.py --chat-id=6c120b
+```
+> Chat ID is found by JSON file name from [chats](./chats/) folder. All saved user-assistant messages will appear in the terminal window.
+
+Currently the script uses `Qwen/Qwen2.5-1.5B-Instruct` model from Hugging Face. The model has been chosen due to its relatively small size and due to the absence of GPU on a local machine. Despite these limitations, the script is adapted to efficiently run the model on both CPU and GPU.
 
 For instance, an excerpt from the possible conversation:
 
@@ -41,17 +64,27 @@ Assistant: A proton is a subatomic particle that has a positive electric charge,
 
 Protons are found in the nucleus of every atom and play a crucial role in determining the chemical properties of elements. They combine with neutrons and electrons to form atoms and molecules. Protons have an important effect on the stability of the nucleus and contribute to the overall structure of the atom.
 ```
-> Enter `quit` to exit the chatbot.
+> Examples of conversations as they are saved in JSON format can also be seen in [this directory](./chats/).
+
+#### Streamlit app
+
+Chatbot can be run in a much more user-friendly manner via Streamlit:
+
+```bash
+streamlit run chatbot_ui.py
+```
+> Running the command will open a browser window, load the model and will ask to load a saved chat or start a new one. To close the app enter Ctrl+C in the terminal window.
+
+User interface in its current version looks like this:
+
+![ui_new_chat](./ui_img/ui_new_chat.jpg)
+
+You can choose either a new chat or load an existing chat from JSON files saved in [chats](./chats/) folder. When loading the saved chat, messages are automatically appearing in the current window:
+
+![ui_saved_chat](./ui_img/ui_saved_messages.jpg)
+
+## ✨ Design details
 
 Responses from the user and assistant are saved and appended to chat history after each turn, thus enabling the LLM to remember what has been said previously and keeping the conversation going. Furthermore, using chat templates helps the model to adequately generate its responses in ChatGPT-like fashion.
 
-### Loading and saving chats
-
-Recently added feature enables loading and saving chats with the assistant that have been started before. For instance, running the above command to launch the chatbot will on exit save a conversation in `chats` folder in the current working directory. 
-
-Alternatively, we can load a conversation one have started and exited by running the following command:
-
-```
-python run_chatbot.py --chat-id=24bd1a
-```
-> All saved user-assistant messages will appear in the terminal window.
+Futhermore, recently added feature enables loading and saving chats with the assistant that have been started before. For instance, running the Python script to launch the chatbot will on exit save a conversation in `chats` folder in the current working directory. 
