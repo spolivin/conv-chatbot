@@ -34,16 +34,13 @@ class ChatModel:
         messages: list[dict[str, str]],
         max_new_tokens: int = 256,
         temperature: float = 0.7,
-    ) -> str:
-        """Generates a LLM response.
+    ):
+        """Generates a response from the LLM based on the provided chat history.
 
         Args:
             messages (list[dict[str, str]]): Chat history.
             max_new_tokens (int, optional): Maximum number of tokens to generate in the output sequence. Defaults to 256.
             temperature (float, optional): Sampling temperature for diversity. Defaults to 0.7.
-
-        Returns:
-            str: LLM response.
         """
         # Applying model’s native chat template
         prompt = self.tokenizer.apply_chat_template(
@@ -76,13 +73,8 @@ class ChatModel:
         )
         generation_thread.start()
 
-        # Streaming, saving and printing the response as it is generated
-        assistant_response = ""
-        for new_text in self.streamer:
-            print(new_text, end="", flush=True)
-            assistant_response += new_text
-        print("\n")
+        # Streaming and yielding the generated tokens as they are being generated
+        for generated_token in self.streamer:
+            yield generated_token
 
         generation_thread.join()
-
-        return assistant_response
